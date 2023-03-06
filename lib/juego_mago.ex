@@ -12,17 +12,20 @@ defmodule JuegoMago do
     puertas = %Puertas{}
     resultado = %Resultado{}
     puerta_vacia = 0
-    resultado = ronda(puertas, puertas_premios, resultado, puerta_vacia, 1)
+    puertas_string = "P1 | P2 | P3 | P4 | P5 | P6 | P7 | P8 | P9 | P10"
+    resultado = ronda(puertas, puertas_premios, resultado, puerta_vacia, puertas_string, 1)
     IO.inspect(resultado)
 
   end
 
-  def ronda(puertas, puertas_premios, resultado, puerta_vacia, ronda) do
+  def ronda(puertas, puertas_premios, resultado, puerta_vacia, puertas_string, ronda) do
 
     if ronda <= 6 do
-      IO.puts("Ronda " <> to_string(ronda))
+      IO.puts("Ronda #" <> to_string(ronda))
+      IO.puts(puertas_string)
       IO.puts("Seleccione la puerta: ")
-      puerta = seleccionar_puerta(String.trim(IO.gets("")))
+      puerta_seleccionada = String.trim(IO.gets(""))
+      puerta = seleccionar_puerta(puerta_seleccionada)
       if verificarPuerta?(puertas, puerta) do
         #actualizar valor correspondiente a puerta seleccionada
         puertas = Map.put(puertas, puerta, Map.get(puertas_premios, puerta))
@@ -31,22 +34,25 @@ defmodule JuegoMago do
         #sumar dinero
         resultado = sumar_dinero(puertas_premios, puerta, resultado)
         puerta_vacia = puertas_vacias(puertas_premios, puerta, puerta_vacia)
+        puertas_string = reemplazar_valor_puerta(puertas_string, puerta_seleccionada, Map.get(puertas_premios, puerta))
+        puertas_string = corregir_string(puertas_string, puerta_seleccionada, Map.get(puertas_premios, puerta))
         cond do
           Map.get(resultado, :llantas) == 4 ->
             IO.puts("Te ganaste un carro")
+            IO.puts("Total acumulado: " <> to_string(Map.get(resultado, :dinero)))
             resultado
           puerta_vacia == 3 ->
             IO.puts("Total acumulado: " <> to_string(Map.get(resultado, :dinero)))
             IO.puts("Llantas encontradas: " <> to_string(Map.get(resultado, :llantas)))
             resultado
           true ->
-            IO.puts("Total acumulado: " <> to_string(Map.get(resultado, :dinero)))
+            IO.puts("Total acumulado: $" <> to_string(Map.get(resultado, :dinero)))
             IO.puts("Llantas encontradas: " <> to_string(Map.get(resultado, :llantas)))
-            ronda(puertas, puertas_premios, resultado, puerta_vacia, ronda + 1)
+            ronda(puertas, puertas_premios, resultado, puerta_vacia, puertas_string, ronda + 1)
         end
       else
         IO.puts("Ya seleccionaste " <> to_string(puerta))
-        ronda(puertas, puertas_premios, resultado, puerta_vacia, ronda + 1)
+        ronda(puertas, puertas_premios, resultado, puerta_vacia, puertas_string, ronda + 1)
       end
     else
       resultado
@@ -102,6 +108,30 @@ defmodule JuegoMago do
     if Map.get(puertas_premios, puerta) == nil do
       IO.puts("Puerta vacia")
       puerta_vacia + 1
+    end
+  end
+
+  def reemplazar_valor_puerta(puertas_string, puerta, valor) when valor == nil do
+    String.replace(puertas_string, puerta, "X")
+  end
+
+  def reemplazar_valor_puerta(puertas_string, puerta, valor) when is_integer(valor) do
+    String.replace(puertas_string, puerta, to_string(valor))
+  end
+
+  def corregir_string(puertas_string, puerta, valor) when is_integer(valor) do
+    if puerta == "P1" do
+      String.replace(puertas_string, to_string(valor) <> "0", "P10")
+    else
+      puertas_string
+    end
+  end
+
+  def corregir_string(puertas_string, puerta, valor) when valor == nil do
+    if puerta == "P1" do
+      String.replace(puertas_string, "X0", "P10")
+    else
+      puertas_string
     end
   end
 
