@@ -8,7 +8,6 @@ defmodule JuegoMago do
     puertasLista = @puertas
     premios = Enum.shuffle(@premios)
     puertas_premios = puertasLista |> Enum.zip(premios) |> Enum.into(%{})
-    IO.inspect(puertas_premios)
     puertas = %Puertas{}
     resultado = %Resultado{}
     puerta_vacia = 0
