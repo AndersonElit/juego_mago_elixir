@@ -39,10 +39,10 @@ defmodule JuegoMago do
         cond do
           Map.get(resultado, :llantas) == 4 ->
             IO.puts("Te ganaste un carro")
-            IO.puts("Total acumulado: " <> to_string(Map.get(resultado, :dinero)))
+            IO.puts("Total acumulado: $" <> to_string(Map.get(resultado, :dinero)))
             resultado
           puerta_vacia == 3 ->
-            IO.puts("Total acumulado: " <> to_string(Map.get(resultado, :dinero)))
+            IO.puts("Total acumulado: $" <> to_string(Map.get(resultado, :dinero)))
             IO.puts("Llantas encontradas: " <> to_string(Map.get(resultado, :llantas)))
             resultado
           true ->
@@ -108,6 +108,8 @@ defmodule JuegoMago do
     if Map.get(puertas_premios, puerta) == nil do
       IO.puts("Puerta vacia")
       puerta_vacia + 1
+    else
+      puerta_vacia
     end
   end
 
